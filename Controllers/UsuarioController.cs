@@ -25,8 +25,6 @@ public class UsuarioController : ControllerBase
     {
         var users = _context.Usuario.Include(u => u.Documentos).Include(u => u.Endereco).OrderBy(u => u.Id).ToList();
 
-        if(users.IsNullOrEmpty()) return NotFound();
-
         List<UsuarioDtoForReturnUsuario> usersToReturn = new();
         foreach(Usuario user in users) {
             usersToReturn.Add(new UsuarioDtoForReturnUsuario(user));
@@ -47,15 +45,16 @@ public class UsuarioController : ControllerBase
         return Ok(userToReturn);
     }
 
-    [HttpPost("login")]
-    public ActionResult<int> LoginUser([FromBody] LoginDto login) {
-        var user = _context.Usuario.Include(u => u.Documentos).Include(u => u.Endereco).FirstOrDefault(c => c.Email == login.email);
+    [HttpGet("simple/{userId}")]
+    public ActionResult<UsuarioDtoForReturnUsuarioSimples> GetUserSimplesById(int userId)
+    {
+        var user = _context.Usuario.Include(u => u.Documentos).Include(u => u.Endereco).FirstOrDefault(c => c.Id == userId);
 
         if(user == null) return NotFound();
-        if(user.Status < 2) return NotFound();
-        if(user.Senha != login.password) return NotFound();
 
-        return Ok(user.Id);
+        UsuarioDtoForReturnUsuarioSimples userToReturn = new UsuarioDtoForReturnUsuarioSimples(user);
+
+        return Ok(userToReturn);
     }
 
     [HttpPost]
@@ -64,6 +63,7 @@ public class UsuarioController : ControllerBase
         var databaseUsers = _context.Usuario.OrderBy(u => u.Id).ToList();
         foreach(Usuario user in databaseUsers) {
             if(userDto.Email.Equals(user.Email)) return BadRequest();
+            if(userDto.Cpf.Equals(user.Cpf)) return BadRequest();
         }
         
         Usuario userEntity = new Usuario(userDto);
@@ -86,20 +86,20 @@ public class UsuarioController : ControllerBase
         return Ok(usuarioForReturn); //ta errado, mas to com preguiça
     }
 
-    // [HttpPut("{userId}")]
-    // public ActionResult<UserDtoForReturn> EditUserById(int userId, UserDtoForEdit userDtoForEdit)
-    // {
-    //     var user = _context.User.FirstOrDefault(c => c.Id == userId);
+    [HttpPut("{userId}")]
+    public ActionResult EditUserById(int userId, UsuarioDtoForUpdateUsuario userDtoForEdit)
+    {
+        var user = _context.Usuario.FirstOrDefault(c => c.Id == userId);
 
-    //     if(user == null) return NotFound();
+        if(user == null) return NotFound();
+        if(userDtoForEdit.Id != userId) return BadRequest();
 
-    //     user.Nome = userDtoForEdit.Nome;
-    //     user.Telefone = userDtoForEdit.Telefone;
-    //     user.Email = userDtoForEdit.Email;
-    //     user.Senha = userDtoForEdit.Senha;
+        user.Email = userDtoForEdit.Email;
+        user.Senha = userDtoForEdit.Senha;
+        _context.SaveChanges();
 
-    //     return NoContent();
-    // }
+        return NoContent();
+    }
 
     [HttpDelete("{userId}")]
     public ActionResult DeleteUserById(int userId)
@@ -118,13 +118,43 @@ public class UsuarioController : ControllerBase
         return NoContent();
     }
 
-    // [HttpDelete("{userCpf}")]
-    // public ActionResult DeleteUser(int userId){
-    //     var userFromDb = _context.FirstOrDefault(c => c.Id == userId)
+    [HttpPost("login")]
+    public ActionResult<int> LoginUser([FromBody] LoginDto login) {
+        var user = _context.Usuario.Include(u => u.Documentos).Include(u => u.Endereco).FirstOrDefault(c => c.Email == login.email);
 
-    //     if(userFromDb == null) return NotFound();
-    //     _context.User.Remove(userFromDb);
+        if(user == null) return NotFound();
+        if(user.Status < 2) return NotFound();
+        if(user.Senha != login.password) return NotFound();
 
-    //     return NoContent();
-    // }
+        return Ok(user.Id);
+    }
+
+    [HttpPost("solicitarPasse/{userId}")]
+    public ActionResult SolicitarPasse(int userId, List<DocumentoDtoForSolicitarPasse> documentos) {
+        var user = _context.Usuario.Include(u => u.Documentos).Include(u => u.Endereco).FirstOrDefault(c => c.Id == userId);
+        if(user == null) return NotFound();
+        if(user.Status != 2) return BadRequest();
+
+        user.Status = 3;
+
+        foreach(DocumentoDtoForSolicitarPasse doc in documentos) {
+            user.Documentos.Add(new Documento(doc));
+        }
+        _context.SaveChanges();
+
+        return NoContent();
+    }
+
+    [HttpPost("usarPasse/{userId}")]
+    public ActionResult UsarPasse(int userId) {
+        var user = _context.Usuario.FirstOrDefault(c => c.Id == userId);
+        if(user == null) return NotFound();
+        if(user.Status != 4) return BadRequest();
+        if(user.Passe_Quantidade < 1) return BadRequest();
+
+        user.Passe_Quantidade--;
+        _context.SaveChanges();
+
+        return NoContent();
+    }
 }

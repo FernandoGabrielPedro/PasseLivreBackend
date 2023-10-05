@@ -14,6 +14,12 @@ public class Documento {
     public Documento(DocumentoDtoForCreateUsuario documento) {
         Nome = documento.Nome;
         Url = documento.Url;
-        IsPasse = documento.IsPasse;
+        IsPasse = false;
+    }
+
+    public Documento(DocumentoDtoForSolicitarPasse documento) {
+        Nome = documento.Nome;
+        Url = documento.Url;
+        IsPasse = true;
     }
 }

@@ -10,6 +10,7 @@ public class EnderecoDtoForReturnUsuario{
     public string Bairro {get; set;} = string.Empty;
     public string Logradouro {get; set;} = string.Empty;
     public string Complemento {get; set;} = string.Empty;
+    public int Numero {get; set;}
 
     public EnderecoDtoForReturnUsuario() {}
     public EnderecoDtoForReturnUsuario(Endereco endereco) {
@@ -22,5 +23,6 @@ public class EnderecoDtoForReturnUsuario{
         Bairro = endereco.Bairro;
         Logradouro = endereco.Logradouro;
         Complemento = endereco.Complemento;
+        Numero = endereco.Numero;
     }
 }

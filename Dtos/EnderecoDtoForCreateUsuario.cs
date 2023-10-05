@@ -7,4 +7,5 @@ public class EnderecoDtoForCreateUsuario {
     public string Bairro {get; set;} = string.Empty;
     public string Logradouro {get; set;} = string.Empty;
     public string Complemento {get; set;} = string.Empty;
+    public int Numero {get; set;}
 }

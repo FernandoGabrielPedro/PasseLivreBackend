@@ -10,6 +10,7 @@ public class Endereco{
     public string Bairro {get; set;} = string.Empty;
     public string Logradouro {get; set;} = string.Empty;
     public string Complemento {get; set;} = string.Empty;
+    public int Numero {get; set;}
     public int Id_Usuario {get; set;}
     public Usuario? Usuario {get; set;}
 
@@ -21,5 +22,6 @@ public class Endereco{
         Bairro = endereco.Bairro;
         Logradouro = endereco.Logradouro;
         Complemento = endereco.Complemento;
+        Numero = endereco.Numero;
     }
 }
