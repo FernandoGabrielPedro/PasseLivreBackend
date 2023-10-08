@@ -123,8 +123,8 @@ public class UsuarioController : ControllerBase
         var user = _context.Usuario.Include(u => u.Documentos).Include(u => u.Endereco).FirstOrDefault(c => c.Email == login.email);
 
         if(user == null) return NotFound();
-        if(user.Status < 2) return NotFound();
         if(user.Senha != login.password) return NotFound();
+        if(user.Status < 2) return StatusCode(500);
 
         return Ok(user.Id);
     }
@@ -137,6 +137,9 @@ public class UsuarioController : ControllerBase
 
         user.Status = 3;
 
+        foreach(Documento doc in user.Documentos) {
+            user.Documentos.Remove(doc);
+        }
         foreach(DocumentoDtoForSolicitarPasse doc in documentos) {
             user.Documentos.Add(new Documento(doc));
         }

@@ -48,7 +48,7 @@ public class UsuarioContext : DbContext
             .IsRequired();
             
         usuario.Property(c => c.Cpf)
-            .HasMaxLength(11)
+            .HasMaxLength(15)
             .IsRequired();
 
         usuario.Property(c => c.Status)
@@ -96,7 +96,7 @@ public class UsuarioContext : DbContext
             .IsRequired();
 
         endereco.Property(e => e.Estado)
-            .HasMaxLength(2)
+            .HasMaxLength(50)
             .IsRequired();
 
         endereco.Property(e => e.Cidade)
