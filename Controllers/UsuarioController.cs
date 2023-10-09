@@ -138,7 +138,7 @@ public class UsuarioController : ControllerBase
         user.Status = 3;
 
         foreach(Documento doc in user.Documentos) {
-            user.Documentos.Remove(doc);
+            if(doc.IsPasse) user.Documentos.Remove(doc);
         }
         foreach(DocumentoDtoForSolicitarPasse doc in documentos) {
             user.Documentos.Add(new Documento(doc));
