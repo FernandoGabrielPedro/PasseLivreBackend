@@ -148,9 +148,9 @@ public class UsuarioController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("usarPasse/{userId}")]
-    public ActionResult UsarPasse(int userId) {
-        var user = _context.Usuario.FirstOrDefault(c => c.Id == userId);
+    [HttpPost("usarPasse/{userEmail}")]
+    public ActionResult UsarPasse(string userEmail) {
+        var user = _context.Usuario.FirstOrDefault(c => c.Email == userEmail);
         if(user == null) return NotFound();
         if(user.Status != 4) return BadRequest();
         if(user.Passe_Quantidade < 1) return BadRequest();
